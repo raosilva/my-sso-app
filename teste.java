@@ -19,3 +19,9 @@ public class LoginServlet extends HttpServlet {
         }
     }
 }
+
+
+<repository>
+  <id>shibboleth-releases</id>
+  <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
+</repository>
