@@ -56,3 +56,55 @@ public class LoginServlet extends HttpServlet {
     </exclusion>
   </exclusions>
 </dependency>
+
+
+
+
+
+    import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet("/fazerLogin")
+public class FazerLoginServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String username = "usuario";  // Troque pelo username desejado
+        String password = "senha";    // Troque pela senha desejada
+        
+        // Montar a URL completa do j_security_check
+        String urlLogin = "http://localhost:8080" + request.getContextPath() + "/j_security_check";
+        
+        // Criar a conexão
+        URL url = new URL(urlLogin);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        
+        // Montar os parâmetros do POST
+        String parametros = "j_username=" + URLEncoder.encode(username, "UTF-8")
+                          + "&j_password=" + URLEncoder.encode(password, "UTF-8");
+        
+        // Escrever os parâmetros no corpo da requisição
+        try (OutputStream os = conn.getOutputStream()) {
+            byte[] input = parametros.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+            os.flush();
+        }
+
+        // Opcional: desconectar explicitamente (não obrigatório)
+        conn.disconnect();
+
+        // Responder ao cliente que o POST foi feito
+        response.setContentType("text/plain");
+        response.getWriter().write("POST para /j_security_check enviado com sucesso.");
+    }
+}
+
