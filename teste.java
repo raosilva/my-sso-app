@@ -164,4 +164,83 @@ public class LoginSimulator {
     }
 }
 
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class FormAuthSimulator {
+
+    private static final String PROTECTED_URL = "http://localhost:8080/app/protegido.jsp";
+    private static final String LOGIN_URL = "http://localhost:8080/app/j_security_check";
+    private static final String USERNAME = "usuario";
+    private static final String PASSWORD = "senha";
+
+    public static void main(String[] args) throws Exception {
+        CookieManager cookieManager = new CookieManager();
+        CookieHandler.setDefault(cookieManager);
+
+        // 1. Tenta acessar página protegida
+        System.out.println("Acessando recurso protegido...");
+        HttpURLConnection conn = (HttpURLConnection) new URL(PROTECTED_URL).openConnection();
+        conn.setInstanceFollowRedirects(false);
+
+        int responseCode = conn.getResponseCode();
+        System.out.println("Código de resposta: " + responseCode);
+
+        if (responseCode == 302 || responseCode == 303) {
+            String location = conn.getHeaderField("Location");
+            System.out.println("Redirecionado para: " + location);
+
+            // 2. Acessa a página de login
+            System.out.println("Acessando página de login...");
+            HttpURLConnection loginPageConn = (HttpURLConnection) new URL(location).openConnection();
+            readResponse(loginPageConn);
+
+            // 3. Faz POST para j_security_check com credenciais
+            System.out.println("Enviando POST para autenticação...");
+            URL url = new URL(LOGIN_URL);
+            HttpURLConnection postConn = (HttpURLConnection) url.openConnection();
+            postConn.setInstanceFollowRedirects(false);
+            postConn.setRequestMethod("POST");
+            postConn.setDoOutput(true);
+            postConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            String urlParameters = "j_username=" + URLEncoder.encode(USERNAME, "UTF-8") +
+                                   "&j_password=" + URLEncoder.encode(PASSWORD, "UTF-8");
+
+            try (DataOutputStream wr = new DataOutputStream(postConn.getOutputStream())) {
+                wr.writeBytes(urlParameters);
+                wr.flush();
+            }
+
+            int postResponseCode = postConn.getResponseCode();
+            System.out.println("Código de resposta do POST: " + postResponseCode);
+
+            String postLocation = postConn.getHeaderField("Location");
+            System.out.println("Redirecionado para: " + postLocation);
+
+            // 4. Acessa o recurso protegido já autenticado
+            System.out.println("Acessando recurso protegido após autenticação...");
+            HttpURLConnection finalConn = (HttpURLConnection) new URL(PROTECTED_URL).openConnection();
+            finalConn.setInstanceFollowRedirects(true);
+
+            readResponse(finalConn);
+        } else {
+            System.out.println("Recurso não protegido ou fluxo diferente.");
+        }
+    }
+
+    private static void readResponse(HttpURLConnection conn) throws IOException {
+        try (BufferedReader in = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()))) {
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine).append("\n");
+            }
+            System.out.println("Resposta:\n" + response);
+        }
+    }
+}
 
