@@ -108,3 +108,60 @@ public class FazerLoginServlet extends HttpServlet {
     }
 }
 
+
+            import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+
+public class LoginSimulator {
+
+    public static void main(String[] args) {
+        try {
+            String targetURL = "http://localhost:8080/SEU_CONTEXTO/j_security_check";
+            String username = "usuario";
+            String password = "senha";
+
+            // Parâmetros como se fossem enviados por um form HTML
+            String urlParameters = "j_username=" + URLEncoder.encode(username, "UTF-8")
+                                 + "&j_password=" + URLEncoder.encode(password, "UTF-8");
+
+            // Criar conexão
+            URL url = new URL(targetURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Length", Integer.toString(urlParameters.getBytes().length));
+            connection.setUseCaches(false);
+
+            // Enviar parâmetros
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                wr.writeBytes(urlParameters);
+                wr.flush();
+            }
+
+            // Ler resposta (opcional)
+            int responseCode = connection.getResponseCode();
+            System.out.println("Response Code : " + responseCode);
+
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream()))) {
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                System.out.println("Resposta: " + response.toString());
+            }
+            
+            connection.disconnect();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
