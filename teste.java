@@ -20,7 +20,19 @@ public class LoginServlet extends HttpServlet {
     }
 }
 
-
+<repositories>
+  <repository>
+    <id>shibboleth-releases</id>
+    <name>Shibboleth Releases Repository</name>
+    <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
+  </repository>
+  
+  <repository>
+    <id>shibboleth-snapshots</id>
+    <name>Shibboleth Snapshots Repository</name>
+    <url>https://build.shibboleth.net/nexus/content/repositories/snapshots/</url>
+  </repository>
+</repositories>
 <repository>
   <id>shibboleth-releases</id>
   <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
