@@ -37,3 +37,22 @@ public class LoginServlet extends HttpServlet {
   <id>shibboleth-releases</id>
   <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
 </repository>
+
+
+
+
+
+
+
+<dependency>
+  <groupId>dependencia.pai</groupId>
+  <artifactId>artefato-pai</artifactId>
+  <version>versao</version>
+  
+  <exclusions>
+    <exclusion>
+      <groupId>net.shibboleth.tool</groupId>
+      <artifactId>xmlselector</artifactId>
+    </exclusion>
+  </exclusions>
+</dependency>
